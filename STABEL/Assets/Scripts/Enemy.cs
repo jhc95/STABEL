@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour {
     private PlayerBehavior player;
-
 	// Use this for initialization
 	void Start () {
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerBehavior>();
@@ -15,5 +14,10 @@ public class Enemy : MonoBehaviour {
         {
             player.Hit(1); 
         }
+    }
+
+    void Update()
+    {
+        transform.Translate(Vector3.down * Time.deltaTime);
     }
 }
