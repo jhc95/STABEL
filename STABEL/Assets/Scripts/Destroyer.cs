@@ -12,22 +12,19 @@ public class Destroyer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (this.transform.position.y <= -10)
+/*        if (this.transform.position.y <= -10)
         {
             Destroy(this.gameObject);
         }
+*/
     }
 
     void OnCollisionEnter(Collision coll)
     {
-        if (coll.gameObject.name == "destroyer")
+        if (coll.gameObject.tag == "Player")
         {
-            Destruction();
+            Destroy(this);
         }
     }
 
-    void Destruction()
-    {
-        Destroy(this.gameObject);
-    }
 }

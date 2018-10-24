@@ -17,6 +17,6 @@ public class Manager : MonoBehaviour {
     private void Update()
     {
         int current = player.currentHealth;
-        heartImage.sprite = hearts[current];
+        //heartImage.sprite = hearts[current];
     }
 }

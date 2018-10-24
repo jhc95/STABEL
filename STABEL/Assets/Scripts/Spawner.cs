@@ -16,6 +16,8 @@ public class Spawner : MonoBehaviour
     private float currentTime;
     private System.Random rnd = new System.Random();
     private SpriteRenderer sprite; //Declare a SpriteRenderer variable to holds our SpriteRenderer component
+    private GameObject instance;
+    private GameObject rewardInstance;
 
 
     // Use this for initialization
@@ -29,28 +31,31 @@ public class Spawner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-/*        if (Time.time >= currentTime + deltaTime * 7)
+        // Spawn objects after 1 second passed
+        if (Time.time >= currentTime + deltaTime)
         {
+            // 40% of the time it will randomly generate a reward on the screen
+            if (Random.Range(0, 100) > 40)
+            {
+                Debug.Log("Spawning reward");
                 float spawnY = Random.Range
                     (Camera.main.ScreenToWorldPoint(new Vector2(0, 0)).y, Camera.main.ScreenToWorldPoint(new Vector2(0, Screen.height)).y);
                 float spawnX = Random.Range
                     (Camera.main.ScreenToWorldPoint(new Vector2(0, 0)).x, Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, 0)).x);
 
                 Vector2 spawnPosition = new Vector2(spawnX, spawnY);
-                GameObject rewardObj = Instantiate(reward, spawnPosition, Quaternion.identity);
-                Destroy(rewardObj.gameObject, 2);
-        }*/
-        // Spawn objects after 1 second passed
-        if (Time.time >= currentTime + deltaTime)
-        {
-            //code something
+                rewardInstance = Instantiate(reward, spawnPosition, Quaternion.identity);
+                Destroy(rewardInstance, 3);
+            }
             int numberOfSpawns = rnd.Next(1, maxSpawns);
             for (int i = 0; i < numberOfSpawns; i++)
             {
                 int xPos = rnd.Next(- (int) sprite.bounds.size.x, (int)sprite.bounds.size.x);
                 spawnPos = new Vector3(xPos, this.transform.position.y, this.transform.position.z);
 
-                Instantiate(spawnee, spawnPos, new Quaternion());
+                instance  = Instantiate(spawnee, spawnPos, new Quaternion());
+                Destroy(instance, 5);
+
 
             }
             currentTime = Time.time;
