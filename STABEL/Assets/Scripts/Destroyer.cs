@@ -4,27 +4,33 @@ using UnityEngine;
 
 public class Destroyer : MonoBehaviour
 {
-    // Use this for initialization
-    void Start()
-    {
-    }
-
+    private float hp = 1;
     // Update is called once per frame
     void Update()
     {
-/*        if (this.transform.position.y <= -10)
+        /*        if (this.transform.position.y <= -10)
+                {
+                    Destroy(this.gameObject);
+                }
+        */
+    
+        if (hp <= 0)
         {
-            Destroy(this.gameObject);
+            Die();
         }
-*/
     }
 
-    void OnCollisionEnter(Collision coll)
+    void OnCollisionEnter2D(Collision2D col)
     {
-        if (coll.gameObject.tag == "Player")
+        if (col.gameObject.tag == "Player")
         {
-            Destroy(this);
+            hp--;
         }
+    }
+
+    void Die()
+    {
+        Destroy(gameObject);
     }
 
 }

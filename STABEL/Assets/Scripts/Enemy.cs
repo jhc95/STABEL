@@ -12,7 +12,7 @@ public class Enemy : MonoBehaviour {
     void OnTriggerEnter2D (Collider2D col) {
         if (col.CompareTag("Player"))
         {
-            player.Hit(1); 
+            player.Hit(1);
         }
     }
 

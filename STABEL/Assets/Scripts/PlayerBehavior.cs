@@ -9,6 +9,7 @@ public class PlayerBehavior : MonoBehaviour {
     private Vector3 direcInit = Vector3.zero;
     public int currentHealth;
     public int maxHealth = 3;
+    public int playerPoints = 0;
 
 	// Use this for initialization
 	void Start () {
@@ -38,7 +39,15 @@ public class PlayerBehavior : MonoBehaviour {
         {
             Hit(1);
         }
+
+        if (collision.gameObject.tag == "Reward")
+        {
+            ScoreManager.currentScore++;
+        }
     }
+
+ 
+
     public void Hit (int dmg)
     {
         currentHealth -= dmg;
