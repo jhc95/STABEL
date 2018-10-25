@@ -50,6 +50,7 @@ public class PlayerBehavior : MonoBehaviour {
 
     public void Hit (int dmg)
     {
-        currentHealth -= dmg;
+        if(currentHealth > 0)
+            currentHealth -= dmg;
     }
 }
