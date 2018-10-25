@@ -18,6 +18,7 @@ public class Enemy : MonoBehaviour {
 
     void Update()
     {
-        transform.Translate(Vector3.down * Time.deltaTime);
+        if(!player.pause)
+            transform.Translate(Vector3.down * Time.deltaTime);
     }
 }

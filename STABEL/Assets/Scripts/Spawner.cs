@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
+    public bool pause = true;
     [SerializeField]
     public float deltaTime;
     // The deltaTime to pass to spawn new objects
@@ -31,34 +32,37 @@ public class Spawner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // Spawn objects after 1 second passed
-        if (Time.time >= currentTime + deltaTime)
+        if (!pause)
         {
-            // 40% of the time it will randomly generate a reward on the screen
-            if (Random.Range(0, 100) > 40)
+            // Spawn objects after 1 second passed
+            if (Time.time >= currentTime + deltaTime)
             {
-                Debug.Log("Spawning reward");
-                float spawnY = Random.Range
-                    (Camera.main.ScreenToWorldPoint(new Vector2(0, 0)).y, Camera.main.ScreenToWorldPoint(new Vector2(0, Screen.height)).y);
-                float spawnX = Random.Range
-                    (Camera.main.ScreenToWorldPoint(new Vector2(0, 0)).x, Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, 0)).x);
+                // 40% of the time it will randomly generate a reward on the screen
+                if (Random.Range(0, 100) > 40)
+                {
+                    Debug.Log("Spawning reward");
+                    float spawnY = Random.Range
+                        (Camera.main.ScreenToWorldPoint(new Vector2(0, 0)).y, Camera.main.ScreenToWorldPoint(new Vector2(0, Screen.height)).y);
+                    float spawnX = Random.Range
+                        (Camera.main.ScreenToWorldPoint(new Vector2(0, 0)).x, Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, 0)).x);
 
-                Vector2 spawnPosition = new Vector2(spawnX, spawnY);
-                rewardInstance = Instantiate(reward, spawnPosition, Quaternion.identity);
-                Destroy(rewardInstance, 3);
+                    Vector2 spawnPosition = new Vector2(spawnX, spawnY);
+                    rewardInstance = Instantiate(reward, spawnPosition, Quaternion.identity);
+                    Destroy(rewardInstance, 3);
+                }
+                int numberOfSpawns = rnd.Next(1, maxSpawns);
+                for (int i = 0; i < numberOfSpawns; i++)
+                {
+                    int xPos = rnd.Next(-(int)sprite.bounds.size.x, (int)sprite.bounds.size.x);
+                    spawnPos = new Vector3(xPos, this.transform.position.y, this.transform.position.z);
+
+                    instance = Instantiate(spawnee, spawnPos, new Quaternion());
+                    Destroy(instance, 5);
+
+
+                }
+                currentTime = Time.time;
             }
-            int numberOfSpawns = rnd.Next(1, maxSpawns);
-            for (int i = 0; i < numberOfSpawns; i++)
-            {
-                int xPos = rnd.Next(- (int) sprite.bounds.size.x, (int)sprite.bounds.size.x);
-                spawnPos = new Vector3(xPos, this.transform.position.y, this.transform.position.z);
-
-                instance  = Instantiate(spawnee, spawnPos, new Quaternion());
-                Destroy(instance, 5);
-
-
-            }
-            currentTime = Time.time;
         }
     }
 }

@@ -7,6 +7,7 @@ public class PlayerBehavior : MonoBehaviour {
     private Rigidbody2D rigid;
     float speed = 40f;
     private Vector3 direcInit = Vector3.zero;
+    public bool pause = true;
     public int currentHealth;
     public int maxHealth = 3;
     public int playerPoints = 0;
@@ -22,15 +23,19 @@ public class PlayerBehavior : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        Vector3 dir = Vector3.zero;
-        dir.x = Input.acceleration.x - direcInit.x;
-        dir.y = Input.acceleration.y - direcInit.y - 0.005f;
-        dir.z = Input.acceleration.z - direcInit.z;
-        if (dir.sqrMagnitude > 1) {
-            dir.Normalize();
+        if (!pause)
+        {
+            Vector3 dir = Vector3.zero;
+            dir.x = Input.acceleration.x - direcInit.x;
+            dir.y = Input.acceleration.y - direcInit.y - 0.005f;
+            dir.z = Input.acceleration.z - direcInit.z;
+            if (dir.sqrMagnitude > 1)
+            {
+                dir.Normalize();
+            }
+            dir *= Time.deltaTime;
+            transform.Translate(dir * speed);
         }
-        dir *= Time.deltaTime;
-        transform.Translate(dir * speed);
 	}
 
     private void OnCollisionEnter2D(Collision2D collision)
