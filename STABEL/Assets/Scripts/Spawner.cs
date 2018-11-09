@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
-    public bool pause = true;
+    public static bool pause = true;
     [SerializeField]
     public float deltaTime;
     // The deltaTime to pass to spawn new objects
     [SerializeField]
     public int maxSpawns;
-    public int numberOfRewards = 2;
+    public int numberOfReward;
     public Vector3 spawnPos;
     public GameObject spawnee;
     public GameObject reward;
@@ -19,6 +19,7 @@ public class Spawner : MonoBehaviour
     private SpriteRenderer sprite; //Declare a SpriteRenderer variable to holds our SpriteRenderer component
     private GameObject instance;
     private GameObject rewardInstance;
+    public static int totalRewards;
 
 
     // Use this for initialization
@@ -26,6 +27,7 @@ public class Spawner : MonoBehaviour
     {
         currentTime = Time.time;
         sprite = GetComponent<SpriteRenderer>(); //Set the reference to our SpriteRenderer component
+        totalRewards = 0;
 
     }
 
@@ -48,16 +50,19 @@ public class Spawner : MonoBehaviour
 
                     Vector2 spawnPosition = new Vector2(spawnX, spawnY);
                     rewardInstance = Instantiate(reward, spawnPosition, Quaternion.identity);
+                    totalRewards++;
+                    print(totalRewards);
                     Destroy(rewardInstance, 3);
                 }
                 int numberOfSpawns = rnd.Next(1, maxSpawns);
                 for (int i = 0; i < numberOfSpawns; i++)
                 {
-                    int xPos = rnd.Next(-(int)sprite.bounds.size.x, (int)sprite.bounds.size.x);
-                    spawnPos = new Vector3(xPos, this.transform.position.y, this.transform.position.z);
+                    float xPos = Random.Range(-11F, 11F);
+                    float yPos = Random.Range(5F ,8F);
+                    spawnPos = new Vector3(xPos, yPos, this.transform.position.z);
 
                     instance = Instantiate(spawnee, spawnPos, new Quaternion());
-                    Destroy(instance, 5);
+                    Destroy(instance, 7);
 
 
                 }

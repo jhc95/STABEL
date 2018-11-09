@@ -29,7 +29,7 @@ public class Manager : MonoBehaviour {
         int current = player.currentHealth;
         heartImage.sprite = hearts[current];
         int points = player.playerPoints;
-        if (!player.pause)
+        if (!Spawner.pause)
         {
             time -= Time.deltaTime;
             timerText.text = "Time: " + (int)(time) + "s";
@@ -38,17 +38,15 @@ public class Manager : MonoBehaviour {
 
     public void PausePlay()
     {
-        if(player.pause)
+        if(Spawner.pause)
         {
-            player.pause = false;
-            spawner.pause = false;
+            Spawner.pause = false;
             InGameMenupanel.SetActive(false);
             buttonText.text = "Pause";
         }
         else
         {
-            player.pause = true;
-            spawner.pause = true;
+            Spawner.pause = true;
             InGameMenupanel.SetActive(true);
             buttonText.text = "Play";
         }

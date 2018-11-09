@@ -6,7 +6,11 @@ public class Enemy : MonoBehaviour {
     private PlayerBehavior player;
 	// Use this for initialization
 	void Start () {
-        player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerBehavior>();
+        if (GameObject.Find("Player") != null)
+        {
+            player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerBehavior>();
+        }
+        
 	}
 	
     void OnTriggerEnter2D (Collider2D col) {
@@ -18,7 +22,8 @@ public class Enemy : MonoBehaviour {
 
     void Update()
     {
-        if(!player.pause)
+        if (!Spawner.pause) {
             transform.Translate(Vector3.down * Time.deltaTime);
+        }
     }
 }

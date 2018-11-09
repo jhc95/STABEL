@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class PlayerBehavior : MonoBehaviour {
 
-    private Rigidbody2D rigid;
-    float speed = 40f;
+    public Rigidbody2D rigid;
+    public float speed;
     private Vector3 direcInit = Vector3.zero;
-    public bool pause = true;
     public int currentHealth;
     public int maxHealth = 3;
     public int playerPoints = 0;
+    public static float velocity;
 
 	// Use this for initialization
 	void Start () {
@@ -23,11 +23,11 @@ public class PlayerBehavior : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (!pause)
+        if (!Spawner.pause)
         {
             Vector3 dir = Vector3.zero;
             dir.x = Input.acceleration.x - direcInit.x;
-            dir.y = Input.acceleration.y - direcInit.y - 0.005f;
+            dir.y = Input.acceleration.y - direcInit.y * 0.005f;
             dir.z = Input.acceleration.z - direcInit.z;
             if (dir.sqrMagnitude > 1)
             {
@@ -35,14 +35,40 @@ public class PlayerBehavior : MonoBehaviour {
             }
             dir *= Time.deltaTime;
             transform.Translate(dir * speed);
-        }
-	}
+            if (transform.position.x <= -9f)
+            {
+                transform.position = new Vector3(-9f, transform.position.y, transform.position.z);
+            }
+            else if (transform.position.x >= 9f)
+            {
+                transform.position = new Vector3(9f, transform.position.y, transform.position.z);
+            }
+            else if (transform.position.y <= -5f)
+            {
+                transform.position = new Vector3(transform.position.x, -5f, transform.position.z);
+            }
+            else if (transform.position.y >= 5f)
+            {
+                transform.position = new Vector3(transform.position.x, 5f, transform.position.z);
+            }
+
+            if (currentHealth == 0) {
+                Destroy(GameObject.Find("Player"));
+                Spawner.pause = true;
+                ScoreManager.dead = true;
+            }
+
+            velocity = rigid.velocity.magnitude;
+        }   
+    }
+
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.tag == "Enemy")
         {
             Hit(1);
+            ScoreManager.hit++;
         }
 
         if (collision.gameObject.tag == "Reward")
