@@ -23,7 +23,7 @@ public class DatabaseManager : MonoBehaviour {
             int totalRewards = Spawner.totalRewards;
             float maxVel = ScoreManager.max;
             float avgVel = ScoreManager.velCounter / ScoreManager.counter;
-            Insert(score, hit, totalRewards - score, maxVel, avgVel);
+            Insert(score, hit, totalRewards - score, avgVel, maxVel);
             ScoreManager.dead = false;
         }
     }

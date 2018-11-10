@@ -10,6 +10,9 @@ public class PlayerBehavior : MonoBehaviour {
     public int currentHealth;
     public int maxHealth = 3;
     public int playerPoints = 0;
+    Vector3 PrevPos;
+    Vector3 NewPos;
+    Vector3 ObjVelocity;
     public static float velocity;
 
 	// Use this for initialization
@@ -19,7 +22,9 @@ public class PlayerBehavior : MonoBehaviour {
         direcInit.z = Input.acceleration.z;
         direcInit.y = Input.acceleration.y;
         currentHealth = maxHealth;
-	}
+        PrevPos = transform.position;
+        NewPos = transform.position;
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -57,8 +62,9 @@ public class PlayerBehavior : MonoBehaviour {
                 Spawner.pause = true;
                 ScoreManager.dead = true;
             }
-
-            velocity = rigid.velocity.magnitude;
+            NewPos = transform.position;  // each frame track the new position
+            velocity = ((NewPos - PrevPos) / Time.fixedDeltaTime).magnitude;  // velocity = dist/time
+            PrevPos = NewPos;  // update position for next frame calculation
         }   
     }
 

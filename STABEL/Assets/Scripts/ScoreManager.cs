@@ -28,7 +28,6 @@ public class ScoreManager : MonoBehaviour {
             counter++;
             float maxVel = PlayerBehavior.velocity;
             velCounter = velCounter + maxVel;
-            velCounter = velCounter + maxVel;
             if (max < maxVel)
             {
                 max = maxVel;
