@@ -24,6 +24,7 @@ public class PlayerBehavior : MonoBehaviour {
         currentHealth = maxHealth;
         PrevPos = transform.position;
         NewPos = transform.position;
+        velocity = 0;
     }
 	
 	// Update is called once per frame
