@@ -5,15 +5,45 @@ using UnityEngine.UI;
 using Mono.Data.Sqlite;
 using System.Data;
 using System;
+using System.Text;
+using System.IO;
 
 public class DatabaseManager : MonoBehaviour {
 
     private String connectionString;
     public Text text;
+    private IDbConnection connection;
+    private IDbCommand command;
+    private IDataReader reader;
+    private string strDelimiter = ", ";
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         connectionString = "URI=file:" + Application.dataPath + "/DB.s3db";
+    }
+
+    private void ExportToCSV(String fileName)
+    {
+    connection = new SqliteConnection(connectionString);
+    connection.Open();
+        command= connection.CreateCommand();
+        command.CommandText="SELECT * FROM Player_Data";
+        reader =command.ExecuteReader();
+        // Final string to print to text file
+        StringBuilder sb = new StringBuilder();
+        System.Object[] items = new System.Object[reader.FieldCount];
+        while (reader.Read()){
+            reader.GetValues(items );
+            foreach (var item in items)
+            {
+                sb.Append(strDelimiter );
+                sb.Append(item.ToString( ) );
+            }
+            sb.Append( "\n" );
+        }  
+
+        connection.Close();
+        File.WriteAllText(fileName + ".txt", sb.ToString());
     }
 
     public void Save () {
