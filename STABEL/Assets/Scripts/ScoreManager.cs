@@ -8,7 +8,6 @@ public class ScoreManager : MonoBehaviour {
     private PlayerBehavior player;
     public static int counter;
     public static float velCounter;
-    public static bool dead;    
     public static int hit;
     public static int currentScore;
     public static float max;
@@ -22,7 +21,6 @@ public class ScoreManager : MonoBehaviour {
         hit = 0;
         max = 0f;
         score = GetComponent<Text>();
-        dead = false;
 }
 	
 	// Update is called once per frame

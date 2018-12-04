@@ -9,15 +9,20 @@ public class PlayerBehavior : MonoBehaviour {
     private Vector3 direcInit = Vector3.zero;
     public int currentHealth;
     public int maxHealth = 3;
-    public int playerPoints = 0;
     Vector3 PrevPos;
     Vector3 NewPos;
     Vector3 ObjVelocity;
     public static float velocity;
+    private Vector2 initialPosition;
+    private Vector2 initialRotation;
+    public AudioSource explosion;
+    public AudioSource coinCollection;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         rigid = GetComponent<Rigidbody2D>();
+        initialPosition = gameObject.transform.position;
+        initialRotation = gameObject.transform.rotation.eulerAngles;
         direcInit.x = Input.acceleration.x;
         direcInit.z = Input.acceleration.z;
         direcInit.y = Input.acceleration.y;
@@ -34,7 +39,7 @@ public class PlayerBehavior : MonoBehaviour {
             Vector3 dir = Vector3.zero;
             dir.x = Input.acceleration.x - direcInit.x;
             dir.y = Input.acceleration.y - direcInit.y * 0.005f;
-            dir.z = Input.acceleration.z - direcInit.z;
+            dir.z = 0f;
             if (dir.sqrMagnitude > 1)
             {
                 dir.Normalize();
@@ -58,11 +63,6 @@ public class PlayerBehavior : MonoBehaviour {
                 transform.position = new Vector3(transform.position.x, 5f, transform.position.z);
             }
 
-            if (currentHealth == 0) {
-                Destroy(GameObject.Find("Player"));
-                Spawner.pause = true;
-                ScoreManager.dead = true;
-            }
             NewPos = transform.position;  // each frame track the new position
             velocity = ((NewPos - PrevPos) / Time.fixedDeltaTime).magnitude;  // velocity = dist/time
             PrevPos = NewPos;  // update position for next frame calculation
@@ -76,11 +76,13 @@ public class PlayerBehavior : MonoBehaviour {
         {
             Hit(1);
             ScoreManager.hit++;
+            explosion.Play();
         }
 
         if (collision.gameObject.tag == "Reward")
         {
             ScoreManager.currentScore++;
+            coinCollection.Play();
         }
     }
 
@@ -90,5 +92,11 @@ public class PlayerBehavior : MonoBehaviour {
     {
         if(currentHealth > 0)
             currentHealth -= dmg;
+    }
+
+    public void ResetOrientation()
+    {
+        gameObject.transform.position = initialPosition;
+        gameObject.transform.eulerAngles = initialRotation;
     }
 }
