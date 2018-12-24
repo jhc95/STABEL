@@ -17,6 +17,7 @@ public class PlayerBehavior : MonoBehaviour {
     private Vector2 initialRotation;
     public AudioSource explosion;
     public AudioSource coinCollection;
+    Vector3 dir;
 
     // Use this for initialization
     void Start () {
@@ -31,42 +32,23 @@ public class PlayerBehavior : MonoBehaviour {
         NewPos = transform.position;
         velocity = 0;
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    // Update is called once per frame
+    void Update()
+    {
         if (!Spawner.pause)
         {
-            Vector3 dir = Vector3.zero;
             dir.x = Input.acceleration.x - direcInit.x;
-            dir.y = Input.acceleration.y - direcInit.y * 0.005f;
-            dir.z = 0f;
-            if (dir.sqrMagnitude > 1)
-            {
-                dir.Normalize();
-            }
-            dir *= Time.deltaTime;
-            transform.Translate(dir * speed);
-            if (transform.position.x <= -9f)
-            {
-                transform.position = new Vector3(-9f, transform.position.y, transform.position.z);
-            }
-            else if (transform.position.x >= 9f)
-            {
-                transform.position = new Vector3(9f, transform.position.y, transform.position.z);
-            }
-            else if (transform.position.y <= -5f)
-            {
-                transform.position = new Vector3(transform.position.x, -5f, transform.position.z);
-            }
-            else if (transform.position.y >= 5f)
-            {
-                transform.position = new Vector3(transform.position.x, 5f, transform.position.z);
-            }
+            dir.y = Input.acceleration.y - direcInit.y;
+
+            Vector3 newPosition = new Vector3(dir.x, dir.y, 0) * 5f;
+            transform.position = Vector3.Lerp(transform.position, newPosition, speed * Time.deltaTime);
 
             NewPos = transform.position;  // each frame track the new position
             velocity = ((NewPos - PrevPos) / Time.fixedDeltaTime).magnitude;  // velocity = dist/time
             PrevPos = NewPos;  // update position for next frame calculation
-        }   
+        }
     }
 
 
