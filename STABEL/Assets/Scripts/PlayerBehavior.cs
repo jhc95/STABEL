@@ -15,25 +15,40 @@ public class PlayerBehavior : MonoBehaviour {
     public static float velocity;
     private Vector2 initialPosition;
     private Vector2 initialRotation;
+    public static float dist;
     public AudioSource explosion;
     public AudioSource coinCollection;
     Vector3 dir;
+    private Quaternion calibrationQuaternion;
+    float maxTilt;
 
     // Use this for initialization
     void Start () {
         rigid = GetComponent<Rigidbody2D>();
         initialPosition = gameObject.transform.position;
         initialRotation = gameObject.transform.rotation.eulerAngles;
-        direcInit.x = Input.acceleration.x;
-        direcInit.z = Input.acceleration.z;
-        direcInit.y = Input.acceleration.y;
+        direcInit.x = 0;
+        direcInit.z = 0;
+        direcInit.y = 0;
         currentHealth = maxHealth;
         PrevPos = transform.position;
         NewPos = transform.position;
         velocity = 0;
+        CalibrateAccelerometer();
+        maxTilt = float.MinValue;
     }
 
-    // Update is called once per frame
+    // Used to calibrate the Input.acceleration
+    void CalibrateAccelerometer()
+    {
+        Vector3 accelerationSnapshot = Input.acceleration;
+
+        Quaternion rotateQuaternion = Quaternion.FromToRotation(
+            new Vector3(0.0f, 0.0f, -1.2f), accelerationSnapshot);
+
+        calibrationQuaternion = Quaternion.Inverse(rotateQuaternion);
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -41,13 +56,18 @@ public class PlayerBehavior : MonoBehaviour {
         {
             dir.x = Input.acceleration.x - direcInit.x;
             dir.y = Input.acceleration.y - direcInit.y;
-
-            Vector3 newPosition = new Vector3(dir.x, dir.y, 0) * 5f;
-            transform.position = Vector3.Lerp(transform.position, newPosition, speed * Time.deltaTime);
-
+            Vector3 acc = Input.acceleration * speed;
+            Vector3 newPosition = new Vector3(dir.x, dir.y, 0) * speed; // 5 to reach end of the screen
+            Vector3 fixedAcc = calibrationQuaternion * acc;
+            fixedAcc.z = 0f;
+            fixedAcc.x *= -1f;
+            fixedAcc.y *= -1f;
+            transform.position = Vector3.Lerp(transform.position, fixedAcc, speed * Time.deltaTime);
             NewPos = transform.position;  // each frame track the new position
             velocity = ((NewPos - PrevPos) / Time.fixedDeltaTime).magnitude;  // velocity = dist/time
             PrevPos = NewPos;  // update position for next frame calculation
+            dist = transform.position.magnitude;
+            Debug.Log(dist);
         }
     }
 

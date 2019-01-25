@@ -27,7 +27,7 @@ public class DatabaseManager : MonoBehaviour {
     connection = new SqliteConnection(connectionString);
     connection.Open();
         command= connection.CreateCommand();
-        command.CommandText="SELECT * FROM Player_Data";
+        command.CommandText="SELECT * FROM Data";
         reader =command.ExecuteReader();
         // Final string to print to text file
         StringBuilder sb = new StringBuilder();
@@ -53,9 +53,10 @@ public class DatabaseManager : MonoBehaviour {
 
         using (IDbCommand dbCmD = dbConnection.CreateCommand()) {
             string sqlQuery = String.Format
-                ("INSERT INTO Player_Data(Score,Hit,Missed_Rewards,Average_Velocity,Maximum_Velocity) " +
-                "VALUES ({0},{1},{2},{3},{4})",ScoreManager.currentScore, ScoreManager.hit
-                , Spawner.totalRewards, ScoreManager.velCounter/ScoreManager.counter, ScoreManager.max);
+                ("INSERT INTO Data(Score,Hit,Missed_Rewards,Average_Velocity,Maximum_Velocity, Maximum_Displacement, Average_Displacement) " +
+                "VALUES ({0},{1},{2},{3},{4},{5},{6})",ScoreManager.currentScore, ScoreManager.hit
+                , Spawner.totalRewards, ScoreManager.velCounter/ScoreManager.counter, ScoreManager.max, 
+                ScoreManager.maxDist, ScoreManager.distCounter / ScoreManager.counter);
             dbCmD.CommandText = sqlQuery;
             dbCmD.ExecuteScalar();
             

@@ -11,6 +11,8 @@ public class ScoreManager : MonoBehaviour {
     public static int hit;
     public static int currentScore;
     public static float max;
+    public static float distCounter;
+    public static float maxDist;
     Text score;
 
     // Use this for initialization
@@ -29,11 +31,18 @@ public class ScoreManager : MonoBehaviour {
         if (!Spawner.pause)
         {
             counter++;
+            float dist = PlayerBehavior.dist;
             float maxVel = PlayerBehavior.velocity;
+            distCounter = distCounter + dist;
             velCounter = velCounter + maxVel;
             if (max < maxVel)
             {
                 max = maxVel;
+            }
+
+            if (maxDist < dist)
+            {
+                maxDist = dist;
             }
         }
     }
