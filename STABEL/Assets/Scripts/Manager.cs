@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
+using Mono.Data.Sqlite;
+using System.Data;
+using System.Text;
+using System.IO;
 
 public class Manager : MonoBehaviour {
 
@@ -32,8 +37,15 @@ public class Manager : MonoBehaviour {
 
     public Sprite[] characters;
     public Sprite[] backgrounds;
-
+    public static String username;
     public GameObject backgroundObject;
+
+    private IDbConnection connection;
+    private IDbCommand command;
+    private IDataReader reader;
+
+    public GameObject usernameE;
+    public GameObject usernameNE;
 
     int cindex = 0;
     int bindex = 0;
@@ -42,6 +54,45 @@ public class Manager : MonoBehaviour {
     {
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerBehavior>();
         spawner = GameObject.FindGameObjectWithTag("Spawner").GetComponent<Spawner>();
+        String connectionString;
+        if (Application.platform != RuntimePlatform.Android)
+        {
+
+            connectionString = Application.dataPath + "/DB.s3db";
+        }
+        else
+        {
+
+            connectionString = Application.persistentDataPath + "/DB.s3db";
+        }
+        connection = new SqliteConnection("URI=file:" + connectionString);
+        connection.Open();
+            command = connection.CreateCommand();
+            command.CommandText = "SELECT * FROM User";
+            reader = command.ExecuteReader();
+            // Final string to print to text file
+            StringBuilder sb = new StringBuilder();
+            System.Object[] items = new System.Object[reader.FieldCount];
+            while (reader.Read())
+            {
+                reader.GetValues(items);
+                foreach (var item in items)
+                {
+                    sb.Append(item.ToString());
+                    username = item.ToString();
+                }
+            }
+            
+            connection.Close();
+
+
+        if (username == null)
+        {
+            usernameNE.SetActive(true);
+        }
+        else {
+            usernameE.SetActive(true);
+        }
 
         time = timelimit;
         timerText.text = "Time: " + (int)(time) + "s";

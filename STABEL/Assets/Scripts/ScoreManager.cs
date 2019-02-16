@@ -15,6 +15,7 @@ public class ScoreManager : MonoBehaviour {
     public static float maxDist;
     Text score;
 
+
     // Use this for initialization
     void Start () {
         currentScore = 0;

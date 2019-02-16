@@ -19,7 +19,16 @@ public class DatabaseManager : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        connectionString = "URI=file:" + Application.dataPath + "/DB.s3db";
+        if (Application.platform != RuntimePlatform.Android)
+        {
+
+            connectionString = Application.dataPath + "/DB.s3db";
+        }
+        else
+        {
+
+            connectionString = Application.persistentDataPath + "/DB.s3db";
+        }
     }
 
     private void ExportToCSV(String fileName)
@@ -48,18 +57,17 @@ public class DatabaseManager : MonoBehaviour {
 
     public void Save () {
         IDbConnection dbConnection;
-        dbConnection = new SqliteConnection(connectionString);
+        dbConnection = new SqliteConnection("URI=file:" + connectionString);
         dbConnection.Open();
 
         using (IDbCommand dbCmD = dbConnection.CreateCommand()) {
             string sqlQuery = String.Format
-                ("INSERT INTO Data(Score,Hit,Missed_Rewards,Average_Velocity,Maximum_Velocity, Maximum_Displacement, Average_Displacement) " +
-                "VALUES ({0},{1},{2},{3},{4},{5},{6})",ScoreManager.currentScore, ScoreManager.hit
-                , Spawner.totalRewards, ScoreManager.velCounter/ScoreManager.counter, ScoreManager.max, 
-                ScoreManager.maxDist, ScoreManager.distCounter / ScoreManager.counter);
+                ("INSERT INTO Player_Data(Score,Hit,Missed_Rewards,Average_Velocity,Maximum_Velocity, Maximum_Displacement, Average_Displacement, Floor_Type) " +
+                "VALUES ({0},{1},{2},{3},{4},{5},{6},'{7}')", ScoreManager.currentScore, ScoreManager.hit
+                , Spawner.totalRewards, ScoreManager.velCounter / ScoreManager.counter, ScoreManager.max,
+                ScoreManager.maxDist, ScoreManager.distCounter / ScoreManager.counter, myDropdown.selected);
             dbCmD.CommandText = sqlQuery;
             dbCmD.ExecuteScalar();
-            
         }
         dbConnection.Close();
         StartCoroutine(TextShow());

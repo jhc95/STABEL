@@ -67,7 +67,6 @@ public class PlayerBehavior : MonoBehaviour {
             velocity = ((NewPos - PrevPos) / Time.fixedDeltaTime).magnitude;  // velocity = dist/time
             PrevPos = NewPos;  // update position for next frame calculation
             dist = transform.position.magnitude;
-            Debug.Log(dist);
         }
     }
 
