@@ -16,9 +16,11 @@ public class DatabaseManager : MonoBehaviour {
     private IDbCommand command;
     private IDataReader reader;
     private string strDelimiter = ", ";
+    private string username;
 
     // Use this for initialization
     void Start () {
+        username = Manager.username;
         if (Application.platform != RuntimePlatform.Android)
         {
 
@@ -70,8 +72,39 @@ public class DatabaseManager : MonoBehaviour {
             dbCmD.ExecuteScalar();
         }
         dbConnection.Close();
+        Send(); //Send Data to Google Sheets.
         StartCoroutine(TextShow());
+    }
 
+    IEnumerator Post()
+    {
+        WWWForm form = new WWWForm();
+
+        form.AddField("entry.279369748", username);
+        form.AddField("entry.668724949", Convert.ToString(ScoreManager.velCounter / ScoreManager.counter));
+        form.AddField("entry.1447013133", Convert.ToString(ScoreManager.max));
+        form.AddField("entry.1483515053", Convert.ToString(ScoreManager.distCounter / ScoreManager.counter));
+        form.AddField("entry.613153977", Convert.ToString(ScoreManager.currentScore));
+        form.AddField("entry.2009085010", Convert.ToString(ScoreManager.hit));
+        form.AddField("entry.106557325", Convert.ToString(3 - ScoreManager.hit)); //hard coded health point
+        form.AddField("entry.999372477", Convert.ToString(Spawner.totalRewards)); 
+        form.AddField("entry.1350369698", "Max angle forward"); //hard coded for max_angle_forward
+
+        //Debug.Log("Preparing data to send");
+        byte[] ramData = form.data;
+        WWW www = new WWW("https://docs.google.com/forms/u/1/d/e/1FAIpQLSfdn08eSFu_fc10372cazqqNd__cyw4ZbvCw0U1vPMJ5eyUUw/formResponse", ramData);
+        //Debug.Log("Sending data");
+        yield return www;
+        //Debug.Log(www.error);
+        //Debug.Log(www.url);
+        //Debug.Log(www.isDone);
+    }
+
+
+    public void Send()
+    {
+        //Debug.Log("I got into this");
+        StartCoroutine(Post());
     }
 
     IEnumerator TextShow() {
