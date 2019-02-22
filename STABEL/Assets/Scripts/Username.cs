@@ -9,9 +9,14 @@ using System.Text;
 using System.IO;
 
 public class Username : MonoBehaviour {
-    public InputField field;
+    public InputField firstfield;
+    public InputField lastfield;
+    public InputField nickfield;
     public GameObject entername;
-    public static string name;
+    public static string firstname;
+    public static string lastname;
+    public static string nickname;
+    public static string unique;
     public GameObject menu;
     public GameObject usernameMenu;
     public GameObject bg;
@@ -26,8 +31,11 @@ public class Username : MonoBehaviour {
     private String connectionString;
 
     public void Click_Continue() {
-        name = field.text;
-        if (name == "")
+        firstname = firstfield.text;
+        lastname = lastfield.text;
+        nickname = nickfield.text;
+        unique = firstname + lastname + nickname.GetHashCode();
+        if (firstname == "" || lastname == "" || nickname == "")
         {
             StartCoroutine(Message());
         }
@@ -70,8 +78,8 @@ public class Username : MonoBehaviour {
         using (IDbCommand dbCmD = dbConnection.CreateCommand())
         {
             string sqlQuery = String.Format
-                ("INSERT INTO User(username) " +
-                "VALUES ('{0}')", name);
+                ("INSERT INTO User(unique_id, first_name, last_name, nickname) " +
+                "VALUES ('{0}', '{1}', '{2}', '{3}')", unique, firstname, lastname, nickname);
             dbCmD.CommandText = sqlQuery;
             dbCmD.ExecuteScalar();
         }
