@@ -44,14 +44,52 @@ public class Manager : MonoBehaviour {
     private IDbCommand command;
     private IDataReader reader;
 
+    public GameObject too_much;
     public GameObject usernameE;
     public GameObject usernameNE;
+    public float start_time;
+    public Boolean create;
 
     int cindex = 0;
     int bindex = 0;
+    public DateTime today;
 
     private void Start()
     {
+        create = false;
+        start_time = Time.time;
+        var fileName = "time.txt";
+        today = System.DateTime.Today;
+        if (!File.Exists(fileName))
+        {
+            var myFile = File.CreateText(fileName);
+            myFile.WriteLine(today);
+            create = true;
+        }
+        else {
+            StreamWriter writer = new StreamWriter(fileName, true);
+            writer.WriteLine(today);
+            writer.Close();
+        }
+        double total_played = 0;
+
+        if (File.Exists("time.txt")) {
+            StreamReader reader = new StreamReader(fileName);
+            while (!reader.EndOfStream) {
+                string date = reader.ReadLine();
+                DateTime parsed_date = DateTime.Parse(date);
+                today = System.DateTime.Today;
+                if (parsed_date == today) {
+                    string time_played = reader.ReadLine();
+                    double played = Convert.ToDouble(time_played);
+                    total_played = total_played + played;
+                    Debug.Log(total_played);
+                }
+            }
+            reader.Close();
+        }
+
+
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerBehavior>();
         spawner = GameObject.FindGameObjectWithTag("Spawner").GetComponent<Spawner>();
         String connectionString;
@@ -85,12 +123,16 @@ public class Manager : MonoBehaviour {
             
             connection.Close();
 
-
-        if (username == null)
+        if (total_played > 7200.00) {
+            too_much.SetActive(true);
+            StartCoroutine(Terminate());
+        }
+        else if (username == null)
         {
             usernameNE.SetActive(true);
         }
-        else {
+        else
+        {
             usernameE.SetActive(true);
         }
 
@@ -104,6 +146,21 @@ public class Manager : MonoBehaviour {
 
         characterImage.sprite = characters[0];
         backgroundImage.sprite = backgrounds[0];
+    }
+
+    IEnumerator Terminate() {
+        yield return new WaitForSeconds(3);
+        Application.Quit();
+    }
+
+    void OnApplicationQuit()
+    {
+        StreamWriter writer = new StreamWriter("time.txt", true);
+        if (create) {
+            writer.WriteLine(today);
+        }
+        writer.WriteLine(Time.time - start_time);
+        writer.Close();
     }
 
     private void Update()
