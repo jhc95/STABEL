@@ -16,8 +16,8 @@ public class Manager : MonoBehaviour {
     public Text timerText;
     public int timelimit;
     private float time;
-    private PlayerBehavior player;
-    private Spawner spawner;
+    public PlayerBehavior player;
+    public Spawner spawner;
 
     public GameObject InGameMenupanel;
     public GameObject SettingsPanel;
@@ -33,7 +33,6 @@ public class Manager : MonoBehaviour {
     private bool valueChanged = false;
 
     public Image characterImage;
-    public Image backgroundImage;
 
     public Sprite[] characters;
     public Sprite[] backgrounds;
@@ -50,9 +49,20 @@ public class Manager : MonoBehaviour {
     public float start_time;
     public Boolean create;
 
-    int cindex = 0;
-    int bindex = 0;
+    public int cindex = 0;
+    public int bindex = 0;
     public DateTime today;
+
+    public Toggle movingToggle;
+    public TwoDShifter stars;
+    public Shifter cloud1;
+    public Shifter cloud2;
+    public Shifter cloud3;
+    public Shifter cloud4;
+    public Shifter cloud5;
+    public Shifter cloud6;
+
+    public Slider colorSlider;
 
     private void Start()
     {
@@ -90,8 +100,8 @@ public class Manager : MonoBehaviour {
         }
 
 
-        player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerBehavior>();
-        spawner = GameObject.FindGameObjectWithTag("Spawner").GetComponent<Spawner>();
+        //player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerBehavior>();
+        //spawner = GameObject.FindGameObjectWithTag("Spawner").GetComponent<Spawner>();
         String connectionString;
         if (Application.platform != RuntimePlatform.Android)
         {
@@ -145,7 +155,6 @@ public class Manager : MonoBehaviour {
         heartsText.text += player.currentHealth;
 
         characterImage.sprite = characters[0];
-        backgroundImage.sprite = backgrounds[0];
     }
 
     IEnumerator Terminate() {
@@ -165,9 +174,7 @@ public class Manager : MonoBehaviour {
 
     private void Update()
     {
-        
-        int current = player.currentHealth;
-        heartImage.sprite = hearts[current];
+        heartImage.sprite = hearts[player.currentHealth];
         heartsText.text = " Hearts Maintained: " + player.currentHealth;
         pointsCollectedText.text = " Points Collected: " + ScoreManager.currentScore;
 
@@ -234,7 +241,7 @@ public class Manager : MonoBehaviour {
         int temp = int.Parse(limit);
         timelimit = temp;
         timerText.text = "Time: " + (int)(timelimit) + "s";
-        timeDurationText.text = " Time Duration: " + (int)timelimit + "s";
+        timeDurationText.text = "Time Duration: " + (int)timelimit + "s";
         valueChanged = true;
     }
 
@@ -242,7 +249,7 @@ public class Manager : MonoBehaviour {
     {
         int temp = int.Parse(limit);
         spawner.maxSpawns = temp;
-        obstacleSpawnText.text = " Obstacle Rate: " + spawner.maxSpawns;
+        obstacleSpawnText.text = "Obstacle Rate: " + spawner.maxSpawns;
         valueChanged = true;
     }
 
@@ -250,7 +257,7 @@ public class Manager : MonoBehaviour {
     {
         float temp = float.Parse(limit);
         player.speed = temp;
-        sensitivityText.text = " Player Sensitivity: " + player.speed;
+        sensitivityText.text = "Player Sensitivity: " + player.speed;
         valueChanged = true;
     }
 
@@ -284,6 +291,7 @@ public class Manager : MonoBehaviour {
             cindex = 0;
         }
         characterImage.sprite = characters[cindex];
+        setColorCharacter();
         for(int i = 0; i < characters.Length; i++)
         {
             if(i == cindex)
@@ -308,6 +316,7 @@ public class Manager : MonoBehaviour {
             cindex = characters.Length-1;
         }
         characterImage.sprite = characters[cindex];
+        setColorCharacter();
         for (int i = 0; i < characters.Length; i++)
         {
             if (i == cindex)
@@ -331,12 +340,12 @@ public class Manager : MonoBehaviour {
         {
             bindex = 0;
         }
-        backgroundImage.sprite = backgrounds[bindex];
         for (int i = 0; i < backgrounds.Length; i++)
         {
             if (i == bindex)
             {
                 backgroundObject.transform.GetChild(i).gameObject.SetActive(true);
+                ToggleBackgroundMoving();
             }
             else
             {
@@ -355,17 +364,72 @@ public class Manager : MonoBehaviour {
         {
             bindex = backgrounds.Length - 1;
         }
-        backgroundImage.sprite = backgrounds[bindex];
         for (int i = 0; i < backgrounds.Length; i++)
         {
             if (i == bindex)
             {
                 backgroundObject.transform.GetChild(i).gameObject.SetActive(true);
+                ToggleBackgroundMoving();
             }
             else
             {
                 backgroundObject.transform.GetChild(i).gameObject.SetActive(false);
             }
         }
+    }
+
+    public void ToggleBackgroundMoving()
+    {
+        if (movingToggle.isOn)
+        {
+            if (bindex == 0)
+            {
+                stars.allowedToMove = true;
+                cloud1.allowedToMove = false;
+                cloud2.allowedToMove = false;
+                cloud3.allowedToMove = false;
+                cloud4.allowedToMove = false;
+                cloud5.allowedToMove = false;
+                cloud6.allowedToMove = false;
+            }
+            else if (bindex == 1)
+            {
+                cloud1.allowedToMove = true;
+                cloud2.allowedToMove = true;
+                cloud3.allowedToMove = true;
+                cloud4.allowedToMove = true;
+                cloud5.allowedToMove = true;
+                cloud6.allowedToMove = true;
+                stars.allowedToMove = false;
+            }
+        }
+        else
+        {
+            stars.allowedToMove = false;
+            cloud1.allowedToMove = false;
+            cloud2.allowedToMove = false;
+            cloud3.allowedToMove = false;
+            cloud4.allowedToMove = false;
+            cloud5.allowedToMove = false;
+            cloud6.allowedToMove = false;
+        }
+    }
+
+    public void setColorCharacter()
+    {
+        Color[] colorData = characterImage.sprite.texture.GetPixels();
+        for (int i = 0; i < colorData.Length; i++)
+        {
+            if(colorData[i].a != 0)
+            {
+                float H;
+                float S;
+                float V;
+                Color.RGBToHSV(colorData[i], out H, out S, out V);
+                colorData[i] = Color.HSVToRGB(colorSlider.value, S, V);
+            }
+        }
+        characterImage.sprite.texture.SetPixels(colorData);
+        characterImage.sprite.texture.Apply();
     }
 }

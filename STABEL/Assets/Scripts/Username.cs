@@ -8,7 +8,8 @@ using System;
 using System.Text;
 using System.IO;
 
-public class Username : MonoBehaviour {
+public class Username : MonoBehaviour
+{
     public InputField firstfield;
     public InputField lastfield;
     public InputField nickfield;
@@ -30,7 +31,8 @@ public class Username : MonoBehaviour {
     private IDataReader reader;
     private String connectionString;
 
-    public void Click_Continue() {
+    public void Click_Continue()
+    {
         firstname = firstfield.text;
         lastname = lastfield.text;
         nickname = nickfield.text;
@@ -39,7 +41,8 @@ public class Username : MonoBehaviour {
         {
             StartCoroutine(Message());
         }
-        else {
+        else
+        {
             usernameMenu.gameObject.SetActive(false);
             menu.gameObject.SetActive(true);
             bg.SetActive(true);
@@ -52,7 +55,8 @@ public class Username : MonoBehaviour {
 
     }
 
-    IEnumerator Message() {
+    IEnumerator Message()
+    {
         entername.gameObject.SetActive(true);
         yield return new WaitForSeconds(2);
         entername.gameObject.SetActive(false);
@@ -84,7 +88,25 @@ public class Username : MonoBehaviour {
             dbCmD.ExecuteScalar();
         }
         dbConnection.Close();
-       
+        Send(); //Send Data to Google Sheets.
+    }
 
+    IEnumerator Post()
+    {
+        WWWForm form = new WWWForm();
+
+        form.AddField("entry.787280587", unique);
+        form.AddField("entry.429652374", firstname);
+        form.AddField("entry.974068326", lastname);
+
+        byte[] ramData = form.data;
+        WWW www = new WWW("https://docs.google.com/forms/u/1/d/e/1FAIpQLSdtIaeQ1O-Eb0ort2Tgce3JvXSjPyq4JQ3BdNvuRqj3BNCIqw/formResponse", ramData);
+        yield return www;
+    }
+
+
+    public void Send()
+    {
+        StartCoroutine(Post());
     }
 }
