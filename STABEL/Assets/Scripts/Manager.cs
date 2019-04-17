@@ -63,46 +63,14 @@ public class Manager : MonoBehaviour {
     public Shifter cloud6;
 
     public Slider colorSlider;
+    public String connectionString;
+    IDbCommand dbcmd;
+
+    public Boolean endGame;
 
     private void Start()
     {
         create = false;
-        start_time = Time.time;
-        var fileName = "time.txt";
-        today = System.DateTime.Today;
-        if (!File.Exists(fileName))
-        {
-            var myFile = File.CreateText(fileName);
-            myFile.WriteLine(today);
-            create = true;
-        }
-        else {
-            StreamWriter writer = new StreamWriter(fileName, true);
-            writer.WriteLine(today);
-            writer.Close();
-        }
-        double total_played = 0;
-
-        if (File.Exists("time.txt")) {
-            StreamReader reader = new StreamReader(fileName);
-            while (!reader.EndOfStream) {
-                string date = reader.ReadLine();
-                DateTime parsed_date = DateTime.Parse(date);
-                today = System.DateTime.Today;
-                if (parsed_date == today) {
-                    string time_played = reader.ReadLine();
-                    double played = Convert.ToDouble(time_played);
-                    total_played = total_played + played;
-                    Debug.Log(total_played);
-                }
-            }
-            reader.Close();
-        }
-
-
-        //player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerBehavior>();
-        //spawner = GameObject.FindGameObjectWithTag("Spawner").GetComponent<Spawner>();
-        String connectionString;
         if (Application.platform != RuntimePlatform.Android)
         {
 
@@ -115,25 +83,81 @@ public class Manager : MonoBehaviour {
         }
         connection = new SqliteConnection("URI=file:" + connectionString);
         connection.Open();
-            command = connection.CreateCommand();
-            command.CommandText = "SELECT * FROM User";
-            reader = command.ExecuteReader();
-            // Final string to print to text file
-            StringBuilder sb = new StringBuilder();
-            System.Object[] items = new System.Object[reader.FieldCount];
-            while (reader.Read())
+        dbcmd = connection.CreateCommand();
+        string createTable1 = "CREATE TABLE IF NOT EXISTS 'Player_Data' ( 'Game' INTEGER PRIMARY KEY, 'Score' INTEGER, " +
+            "'Hit' INTEGER, 'Missed_Rewards' INTEGER, 'Average_Velocity' INTEGER, 'Maximum_Velocity' INTEGER, " +
+            "'Average_Displacement' INTEGER, 'Maximum_Displacement' INTEGER, 'Floor_Type' TEXT, 'Date' DATE DEFAULT CURRENT_DATE, " +
+            "'Time' TIME DEFAULT CURRENT_TIME)";
+        string createTable2 = "CREATE TABLE IF NOT EXISTS 'User' ('unique_id' TEXT, 'first_name' TEXT, " +
+            "'last_name' TEXT, 'nickname' TEXT)";
+        using (IDbCommand dbCmD = connection.CreateCommand())
+        {
+            dbCmD.CommandText = createTable1;
+            dbCmD.ExecuteScalar();
+            dbCmD.CommandText = createTable2;
+            dbCmD.ExecuteScalar();
+        }
+        //start_time = Time.time;
+        //var fileName = "time.txt";
+        /*
+        today = System.DateTime.Today;
+        if (!File.Exists(fileName))
+        {
+            var myFile = File.CreateText(fileName);
+            create = true;
+            myFile.Close();
+        }
+        else
+        {
+            StreamWriter writer = new StreamWriter(fileName, true);
+            writer.WriteLine(today);
+            writer.Close();
+        }
+        */
+        double total_played = 0;
+        /*
+        if (File.Exists("time.txt"))
+        {
+            StreamReader reader = new StreamReader(fileName);
+            while (!reader.EndOfStream)
             {
-                reader.GetValues(items);
-                foreach (var item in items)
+                string date = reader.ReadLine();
+                today = System.DateTime.Today;
+                if (date.Equals(today.ToString()))
                 {
-                    sb.Append(item.ToString());
-                    username = item.ToString();
+                    string time_played = reader.ReadLine();
+                    double played = Convert.ToDouble(time_played);
+                    total_played = total_played + played;
+                    Debug.Log(total_played);
                 }
             }
-            
-            connection.Close();
+            reader.Close();
+        }
+        */
 
-        if (total_played > 7200.00) {
+
+        //player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerBehavior>();
+        //spawner = GameObject.FindGameObjectWithTag("Spawner").GetComponent<Spawner>();
+        command = connection.CreateCommand();
+        command.CommandText = "SELECT * FROM User";
+        reader = command.ExecuteReader();
+        // Final string to print to text file
+        StringBuilder sb = new StringBuilder();
+        System.Object[] items = new System.Object[reader.FieldCount];
+        while (reader.Read())
+        {
+            reader.GetValues(items);
+            foreach (var item in items)
+            {
+                sb.Append(item.ToString());
+                username = item.ToString();
+            }
+        }
+
+        connection.Close();
+
+        if (total_played > 7200.00)
+        {
             too_much.SetActive(true);
             StartCoroutine(Terminate());
         }
@@ -189,6 +213,26 @@ public class Manager : MonoBehaviour {
             {
                 Spawner.pause = true;
                 buttonText.text = "Play";
+                endGame = true;
+                if (endGame)
+                {
+                    IDbConnection dbConnection;
+                    dbConnection = new SqliteConnection("URI=file:" + connectionString);
+                    dbConnection.Open();
+
+                    using (IDbCommand dbCmD = dbConnection.CreateCommand())
+                    {
+                        string sqlQuery = String.Format
+                            ("INSERT INTO Player_Data(Score,Hit,Missed_Rewards,Average_Velocity,Maximum_Velocity, Maximum_Displacement, Average_Displacement, Floor_Type) " +
+                            "VALUES ({0},{1},{2},{3},{4},{5},{6},'{7}')", ScoreManager.currentScore, ScoreManager.hit
+                            , Spawner.totalRewards, ScoreManager.velCounter / ScoreManager.counter, ScoreManager.max,
+                            ScoreManager.maxDist, ScoreManager.distCounter / ScoreManager.counter, myDropdown.selected);
+                        dbCmD.CommandText = sqlQuery;
+                        dbCmD.ExecuteScalar();
+                    }
+                    dbConnection.Close();
+                    endGame = false;
+                }
             }
             timerText.text = "Time: " + (int)(time) + "s";
         }
