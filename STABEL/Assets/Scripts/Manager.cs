@@ -85,55 +85,23 @@ public class Manager : MonoBehaviour {
         connection.Open();
         dbcmd = connection.CreateCommand();
         string createTable1 = "CREATE TABLE IF NOT EXISTS 'Player_Data' ( 'Game' INTEGER PRIMARY KEY, 'Score' INTEGER, " +
-            "'Hit' INTEGER, 'Missed_Rewards' INTEGER, 'Average_Velocity' INTEGER, 'Maximum_Velocity' INTEGER, " +
-            "'Average_Displacement' INTEGER, 'Maximum_Displacement' INTEGER, 'Floor_Type' TEXT, 'Date' DATE DEFAULT CURRENT_DATE, " +
+            "'Hit' INTEGER, 'Missed_Rewards' INTEGER, 'Average_Velocity' FLOAT, 'Maximum_Velocity' FLOAT, " +
+            "'Max_X_Tilt' FLOAT, 'Max_Y_Tilt' FLOAT, 'Floor_Type' TEXT, 'Date' DATE DEFAULT CURRENT_DATE, " +
             "'Time' TIME DEFAULT CURRENT_TIME)";
         string createTable2 = "CREATE TABLE IF NOT EXISTS 'User' ('unique_id' TEXT, 'first_name' TEXT, " +
             "'last_name' TEXT, 'nickname' TEXT)";
+        string createTable3 = "CREATE TABLE IF NOT EXISTS 'Time' ('Date' DATE DEFAULT CURRENT_DATE, 'Played_in_sec' FLOAT)";
         using (IDbCommand dbCmD = connection.CreateCommand())
         {
             dbCmD.CommandText = createTable1;
             dbCmD.ExecuteScalar();
             dbCmD.CommandText = createTable2;
             dbCmD.ExecuteScalar();
+            dbCmD.CommandText = createTable3;
+            dbCmD.ExecuteScalar();
         }
-        //start_time = Time.time;
-        //var fileName = "time.txt";
-        /*
-        today = System.DateTime.Today;
-        if (!File.Exists(fileName))
-        {
-            var myFile = File.CreateText(fileName);
-            create = true;
-            myFile.Close();
-        }
-        else
-        {
-            StreamWriter writer = new StreamWriter(fileName, true);
-            writer.WriteLine(today);
-            writer.Close();
-        }
-        */
+        start_time = Time.time;
         double total_played = 0;
-        /*
-        if (File.Exists("time.txt"))
-        {
-            StreamReader reader = new StreamReader(fileName);
-            while (!reader.EndOfStream)
-            {
-                string date = reader.ReadLine();
-                today = System.DateTime.Today;
-                if (date.Equals(today.ToString()))
-                {
-                    string time_played = reader.ReadLine();
-                    double played = Convert.ToDouble(time_played);
-                    total_played = total_played + played;
-                    Debug.Log(total_played);
-                }
-            }
-            reader.Close();
-        }
-        */
 
 
         //player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerBehavior>();
@@ -188,12 +156,18 @@ public class Manager : MonoBehaviour {
 
     void OnApplicationQuit()
     {
-        StreamWriter writer = new StreamWriter("time.txt", true);
-        if (create) {
-            writer.WriteLine(today);
+        IDbConnection dbConnection;
+        dbConnection = new SqliteConnection("URI=file:" + connectionString);
+        dbConnection.Open();
+        float played = Time.time - start_time;
+        using (IDbCommand dbCmD = dbConnection.CreateCommand())
+        {
+            string sqlQuery = String.Format
+                ("INSERT INTO Time(Played_in_sec) VALUES ({0})", (int)played);
+            dbCmD.CommandText = sqlQuery;
+            dbCmD.ExecuteScalar();
         }
-        writer.WriteLine(Time.time - start_time);
-        writer.Close();
+        dbConnection.Close();
     }
 
     private void Update()
@@ -223,10 +197,10 @@ public class Manager : MonoBehaviour {
                     using (IDbCommand dbCmD = dbConnection.CreateCommand())
                     {
                         string sqlQuery = String.Format
-                            ("INSERT INTO Player_Data(Score,Hit,Missed_Rewards,Average_Velocity,Maximum_Velocity, Maximum_Displacement, Average_Displacement, Floor_Type) " +
+                            ("INSERT INTO Player_Data(Score,Hit,Missed_Rewards,Average_Velocity,Maximum_Velocity, Max_X_Tilt, Max_Y_Tilt, Floor_Type) " +
                             "VALUES ({0},{1},{2},{3},{4},{5},{6},'{7}')", ScoreManager.currentScore, ScoreManager.hit
                             , Spawner.totalRewards, ScoreManager.velCounter / ScoreManager.counter, ScoreManager.max,
-                            ScoreManager.maxDist, ScoreManager.distCounter / ScoreManager.counter, myDropdown.selected);
+                            ScoreManager.xMaxTilt, ScoreManager.yMaxTilt, myDropdown.selected);
                         dbCmD.CommandText = sqlQuery;
                         dbCmD.ExecuteScalar();
                     }

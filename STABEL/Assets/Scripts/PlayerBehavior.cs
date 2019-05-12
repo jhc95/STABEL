@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,11 +17,15 @@ public class PlayerBehavior : MonoBehaviour {
     private Vector2 initialPosition;
     private Vector2 initialRotation;
     public static float dist;
+    public static float xtilt;
+    public static float ytilt;
     public AudioSource explosion;
     public AudioSource coinCollection;
     Vector3 dir;
     private Quaternion calibrationQuaternion;
     float maxTilt;
+    float prevX = 0;
+    float prevY = 0;
 
     // Use this for initialization
     void Start () {
@@ -56,20 +61,26 @@ public class PlayerBehavior : MonoBehaviour {
         {
             dir.x = Input.acceleration.x - direcInit.x;
             dir.y = Input.acceleration.y - direcInit.y;
-            Vector3 acc = Input.acceleration * speed;
-            Vector3 newPosition = new Vector3(dir.x, dir.y, 0) * speed; // 5 to reach end of the screen
-            Vector3 fixedAcc = calibrationQuaternion * acc;
-            fixedAcc.z = 0f;
-            fixedAcc.x *= -1f;
-            fixedAcc.y *= -1f;
-            transform.position = Vector3.Lerp(transform.position, fixedAcc, speed * Time.deltaTime);
-            NewPos = transform.position;  // each frame track the new position
-            velocity = ((NewPos - PrevPos) / Time.fixedDeltaTime).magnitude;  // velocity = dist/time
-            PrevPos = NewPos;  // update position for next frame calculation
-            dist = transform.position.magnitude;
+            if ((Math.Abs(dir.x - prevX) > 0.008 || Math.Abs(dir.y - prevY) > 0.008))
+            {
+                Vector3 acc = Input.acceleration * speed;
+                Vector3 newPosition = new Vector3(dir.x, dir.y, 0) * speed; // 5 to reach end of the screen
+                Vector3 fixedAcc = calibrationQuaternion * acc;
+                fixedAcc.z = 0f;
+                fixedAcc.x *= -1f;
+                fixedAcc.y *= -1f;
+                transform.position = Vector3.Lerp(transform.position, fixedAcc, speed * Time.deltaTime);
+                xtilt = Math.Abs(dir.x * 90);
+                ytilt = Math.Abs((dir.y + 1) * 90);
+                NewPos = transform.position;  // each frame track the new position
+                velocity = ((NewPos - PrevPos) / Time.fixedDeltaTime).magnitude;  // velocity = dist/time
+                PrevPos = NewPos;  // update position for next frame calculation
+                dist = transform.position.magnitude;
+                prevX = dir.x;
+                prevY = dir.y;
+            }
         }
     }
-
 
     private void OnCollisionEnter2D(Collision2D collision)
     {

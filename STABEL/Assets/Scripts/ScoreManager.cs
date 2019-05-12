@@ -13,6 +13,9 @@ public class ScoreManager : MonoBehaviour {
     public static float max;
     public static float distCounter;
     public static float maxDist;
+    public static float yMaxTilt;
+    public static float xMaxTilt;
+
     Text score;
 
 
@@ -34,6 +37,9 @@ public class ScoreManager : MonoBehaviour {
             counter++;
             float dist = PlayerBehavior.dist;
             float maxVel = PlayerBehavior.velocity;
+            float xTilt = PlayerBehavior.xtilt;
+            float yTilt = PlayerBehavior.ytilt;
+
             distCounter = distCounter + dist;
             velCounter = velCounter + maxVel;
             if (max < maxVel)
@@ -44,6 +50,16 @@ public class ScoreManager : MonoBehaviour {
             if (maxDist < dist)
             {
                 maxDist = dist;
+            }
+
+            if (xMaxTilt < xTilt)
+            {
+                xMaxTilt = xTilt;
+            }
+
+            if (yMaxTilt < yTilt)
+            {
+                yMaxTilt = yTilt;
             }
         }
     }
