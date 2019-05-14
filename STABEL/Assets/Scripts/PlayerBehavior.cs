@@ -13,12 +13,13 @@ public class PlayerBehavior : MonoBehaviour {
     Vector3 PrevPos;
     Vector3 NewPos;
     Vector3 ObjVelocity;
-    public static float velocity;
+    public static double velocity;
     private Vector2 initialPosition;
     private Vector2 initialRotation;
     public static float dist;
     public static float xtilt;
     public static float ytilt;
+    public static double diagonalTilt;
     public AudioSource explosion;
     public AudioSource coinCollection;
     Vector3 dir;
@@ -32,9 +33,6 @@ public class PlayerBehavior : MonoBehaviour {
         rigid = GetComponent<Rigidbody2D>();
         initialPosition = gameObject.transform.position;
         initialRotation = gameObject.transform.rotation.eulerAngles;
-        direcInit.x = 0;
-        direcInit.z = 0;
-        direcInit.y = 0;
         currentHealth = maxHealth;
         PrevPos = transform.position;
         NewPos = transform.position;
@@ -59,9 +57,9 @@ public class PlayerBehavior : MonoBehaviour {
     {
         if (!Spawner.pause)
         {
-            dir.x = Input.acceleration.x - direcInit.x;
-            dir.y = Input.acceleration.y - direcInit.y;
-            if ((Math.Abs(dir.x - prevX) > 0.008 || Math.Abs(dir.y - prevY) > 0.008))
+            dir.x = Input.acceleration.x;
+            dir.y = Input.acceleration.y;
+            if ((Math.Abs(dir.x - prevX) > 0.01 || Math.Abs(dir.y - prevY) > 0.01))
             {
                 Vector3 acc = Input.acceleration * speed;
                 Vector3 newPosition = new Vector3(dir.x, dir.y, 0) * speed; // 5 to reach end of the screen
@@ -70,10 +68,20 @@ public class PlayerBehavior : MonoBehaviour {
                 fixedAcc.x *= -1f;
                 fixedAcc.y *= -1f;
                 transform.position = Vector3.Lerp(transform.position, fixedAcc, speed * Time.deltaTime);
-                xtilt = Math.Abs(dir.x * 90);
-                ytilt = Math.Abs((dir.y + 1) * 90);
                 NewPos = transform.position;  // each frame track the new position
-                velocity = ((NewPos - PrevPos) / Time.fixedDeltaTime).magnitude;  // velocity = dist/time
+                int multiplier = 1;
+                if (NewPos.y < 0)
+                {
+                    multiplier = -1;
+                }
+                double oldDiagonalTilt = Math.Sqrt(Math.Pow(xtilt, 2) + Math.Pow(ytilt, 2));
+                xtilt = dir.x * -90;
+                ytilt = (dir.y + 1) * 90 * multiplier;
+                double fps = 1 / Time.deltaTime;
+                diagonalTilt = Math.Sqrt(Math.Pow(xtilt, 2) + Math.Pow(ytilt, 2));
+                velocity = Math.Abs(diagonalTilt - oldDiagonalTilt);  // velocity = dist/time
+                Debug.Log(velocity);
+ 
                 PrevPos = NewPos;  // update position for next frame calculation
                 dist = transform.position.magnitude;
                 prevX = dir.x;
@@ -85,7 +93,7 @@ public class PlayerBehavior : MonoBehaviour {
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.tag == "Enemy")
-        {
+        {         
             Hit(1);
             ScoreManager.hit++;
             explosion.Play();

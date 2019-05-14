@@ -15,6 +15,5 @@ public class myDropdown : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         selected = platform.options[platform.value].text;
-        Debug.Log(selected);
     }
 }
