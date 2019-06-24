@@ -23,6 +23,7 @@ public class Manager : MonoBehaviour {
     public GameObject SettingsPanel;
     public GameObject CustomizationPanel;
     public GameObject ExportDataPanel;
+    public GameObject LevelPanel;
 
     public Text gameStateText;
     public Text heartsText;
@@ -332,18 +333,29 @@ public class Manager : MonoBehaviour {
         SettingsPanel.SetActive(true);
         CustomizationPanel.SetActive(false);
         ExportDataPanel.SetActive(false);
+        LevelPanel.SetActive(false);
     }
     public void ActivateCustomizationPanel()
     {
         SettingsPanel.SetActive(false);
         CustomizationPanel.SetActive(true);
         ExportDataPanel.SetActive(false);
+        LevelPanel.SetActive(false);
     }
     public void ActivateExportDatePanel()
     {
         SettingsPanel.SetActive(false);
         CustomizationPanel.SetActive(false);
         ExportDataPanel.SetActive(true);
+        LevelPanel.SetActive(false);
+    }
+
+    public void ActivateLevelPanel()
+    {
+        LevelPanel.SetActive(true);
+        SettingsPanel.SetActive(false);
+        CustomizationPanel.SetActive(false);
+        ExportDataPanel.SetActive(false);
     }
 
     public void ToggleCharacterRight()
@@ -430,6 +442,22 @@ public class Manager : MonoBehaviour {
         {
             bindex = backgrounds.Length - 1;
         }
+        for (int i = 0; i < backgrounds.Length; i++)
+        {
+            if (i == bindex)
+            {
+                backgroundObject.transform.GetChild(i).gameObject.SetActive(true);
+                ToggleBackgroundMoving();
+            }
+            else
+            {
+                backgroundObject.transform.GetChild(i).gameObject.SetActive(false);
+            }
+        }
+    }
+
+    public void UpdateBackground()
+    {
         for (int i = 0; i < backgrounds.Length; i++)
         {
             if (i == bindex)
