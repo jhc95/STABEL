@@ -239,25 +239,25 @@ public class Manager : MonoBehaviour {
     IEnumerator Post()
     {
         WWWForm form = new WWWForm();
-
-        form.AddField("entry.279369748", username);
-        form.AddField("entry.668724949", Convert.ToString(ScoreManager.velCounter / ScoreManager.counter));
-        form.AddField("entry.1447013133", Convert.ToString(ScoreManager.max));
-        form.AddField("entry.1483515053", Convert.ToString(ScoreManager.distCounter / ScoreManager.counter));
-        form.AddField("entry.613153977", Convert.ToString(ScoreManager.currentScore));
-        form.AddField("entry.2009085010", Convert.ToString(ScoreManager.hit));
-        form.AddField("entry.106557325", Convert.ToString(3 - ScoreManager.hit)); //hard coded health point
-        form.AddField("entry.999372477", Convert.ToString(Spawner.totalRewards)); 
-        form.AddField("entry.1350369698", "Max angle forward"); //hard coded for max_angle_forward
-
-        //Debug.Log("Preparing data to send");
+        form.AddField("entry.1611850975", username);
+        form.AddField("entry.1296760658", Convert.ToString(ScoreManager.currentScore));
+        form.AddField("entry.1248976845", Convert.ToString(ScoreManager.hit));
+        form.AddField("entry.318023208", Convert.ToString(Spawner.totalRewards));
+        form.AddField("entry.197410660", Convert.ToString(ScoreManager.velCounter / ScoreManager.counter));
+        form.AddField("entry.2124964941", Convert.ToString(ScoreManager.max));
+        form.AddField("entry.1286264765", Convert.ToString(ScoreManager.xMaxTilt));
+        form.AddField("entry.2098428622", Convert.ToString(ScoreManager.xMaxTiltneg));
+        form.AddField("entry.1950719982", Convert.ToString(ScoreManager.yMaxTilt));
+        form.AddField("entry.1305965629", Convert.ToString(ScoreManager.yMaxTiltneg));
+        form.AddField("entry.1221308465", Convert.ToString(myDropdown.selected));
+        form.AddField("entry.1566115659", Convert.ToString(LevelSelector.currentLevel));
+        Debug.Log("YOOOOO" + LevelSelector.currentLevel);
+        //https://docs.google.com/forms/u/1/d/10sMmIs4Na0tUKWNLsaWDhAeIlHNG8wC9dfqMeNfeH5s/formResponse
+        Debug.Log("Preparing data to send");
         byte[] ramData = form.data;
-        WWW www = new WWW("https://docs.google.com/forms/u/1/d/e/1FAIpQLSfdn08eSFu_fc10372cazqqNd__cyw4ZbvCw0U1vPMJ5eyUUw/formResponse", ramData);
-        //Debug.Log("Sending data");
+        //WWW www = new WWW("https://docs.google.com/forms/u/1/d/e/1FAIpQLSfdn08eSFu_fc10372cazqqNd__cyw4ZbvCw0U1vPMJ5eyUUw/formResponse", ramData);
+        WWW www = new WWW("https://docs.google.com/forms/u/1/d/10sMmIs4Na0tUKWNLsaWDhAeIlHNG8wC9dfqMeNfeH5s/formResponse", ramData);
         yield return www;
-        //Debug.Log(www.error);
-        //Debug.Log(www.url);
-        //Debug.Log(www.isDone);
     }
 
 

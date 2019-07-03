@@ -27,6 +27,7 @@ public class LevelSelector : MonoBehaviour
     int numLevels = 0;
     public Dropdown dropdown;
     public GameObject panel;
+    public static String currentLevel;
 
     String range = "";
     SpreadsheetsResource.ValuesResource.GetRequest request;
@@ -148,6 +149,7 @@ public class LevelSelector : MonoBehaviour
             {
                 if(rowIndex == dropdown.value)
                 {
+                    currentLevel = values[rowIndex][0].ToString();
                     manager.SetSensitivityLimit(values[rowIndex][1].ToString());
                     manager.SetObstacleSpawnLimit(values[rowIndex][2].ToString());
                     manager.SetTimeLimit(values[rowIndex][3].ToString());
